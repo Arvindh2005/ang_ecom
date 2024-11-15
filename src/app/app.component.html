@@ -26,6 +26,7 @@
                   <a class="nav-link" href="#">Projects</a>
               </li>
           </ul>
+          
           <!-- Left links -->
       </div>
       <!-- Collapsible wrapper -->
@@ -33,68 +34,50 @@
       <!-- Right elements -->
       <div class="d-flex align-items-center">
           <!-- Icon -->
-          <a class="link-secondary me-3" href="#">
-              <i class="fa fa-shopping-cart"></i>
+           @if(loggedUserData.custId == 0){
+
+            <button class="btn btn-success btn-sm" (click) = "openLoginModel()">Login</button>
+            <button class="btn btn-success btn-sm mx-2" (click)="openRegisterModel()">Register</button>
+           }
+           @else{
+            <button class="btn btn-success btn-sm">{{loggedUserData.name}}</button>
+            <button class="btn btn-success btn-sm mx-2" (click)="logoff()">LogOff</button>
+           }
+           
+          <a class="link-secondary me-3">
+              <i class="fa fa-shopping-cart text-white" (click)="showCartPopup()"></i>
           </a>
-          <!-- <div class="dropdown-menu dropdown-menu-end show" style="position: absolute;
+          <div [className]="isCartPopupOpen ? 'dropdown-menu dropdown-menu-end show' : 'dropdown-menu dropdown-menu-end hide'" style="position: absolute;
           right: 13px;top:60px" aria-labelledby="navbarDropdownMenuAvatar">
               <div class="row">
                   <div class="col-8">
                       <h6>Cart Items</h6>
                   </div>
                   <div class="col-4 text-end">
-                      <i class="fa fa-close p-2"></i>
+                      <i class="fa fa-close p-2" (click)="showCartPopup()"></i>
                   </div>
               </div>
 
 
               <table class="table table-sm">
                   <tbody>
-                      <tr>
-                          <td>
-                              <div class="rounded"
-                                  style="background-image: url(https://unsplash.com/photos/ZBwQ2bCbJjw/download?force=true&amp;w=640); width: 60px; height: 60px; background-size: cover;">
-                              </div>
-                          </td>
-                          <td class="align-middle text-left">Spy Suit</td>
-                          <td class="align-middle text-center">1 pieces</td>
-                          <td class="align-middle text-right">$698</td>
-                          <td class="align-middle text-center">
-                              <a href="#delete" data-toggle="modal" data-title="Delete your product ?">
-                                  <i class="fa fa-trash"></i>
-                              </a>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <div class="rounded"
-                                  style="background-image: url(https://unsplash.com/photos/ZBwQ2bCbJjw/download?force=true&amp;w=640); width: 60px; height: 60px; background-size: cover;">
-                              </div>
-                          </td>
-                          <td class="align-middle text-left">Spy Suit</td>
-                          <td class="align-middle text-center">1 pieces</td>
-                          <td class="align-middle text-right">$698</td>
-                          <td class="align-middle text-center">
-                              <a href="#delete" data-toggle="modal" data-title="Delete your product ?">
-                                  <i class="fa fa-trash"></i>
-                              </a>
-                          </td>
-                      </tr>
-                      <tr>
-                          <td>
-                              <div class="rounded"
-                                  style="background-image: url(https://unsplash.com/photos/ZBwQ2bCbJjw/download?force=true&amp;w=640); width: 60px; height: 60px; background-size: cover;">
-                              </div>
-                          </td>
-                          <td class="align-middle text-left">Spy Suit</td>
-                          <td class="align-middle text-center">1 pieces</td>
-                          <td class="align-middle text-right">$698</td>
-                          <td class="align-middle text-center">
-                              <a href="#delete" data-toggle="modal" data-title="Delete your product ?">
-                                  <i class="fa fa-trash"></i>
-                              </a>
-                          </td>
-                      </tr>
+                    @for(item of cartData; track $index){
+                        <tr>
+                            <td>
+                                <div class="rounded"
+                                    style="background-image: url({{item.productImageUrl}}); width: 60px; height: 60px; background-size: cover;">
+                                </div>
+                            </td>
+                            <td class="align-middle text-left">{{item.productName}}</td>
+                            <td class="align-middle text-center">{{item.quantity}} pieces</td>
+                            <td class="align-middle text-right">${{item.productPrice}}</td>
+                            <td class="align-middle text-center">
+                                <a (click)="onRemoveProduct(item.cartId)" data-toggle="modal" data-title="Delete your product ?">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
 
                       <tr>
                           <td colspan="4" class="align-middle text-right">Quantity</td>
@@ -106,9 +89,100 @@
                       </tr>
                   </tbody>
               </table>
-          </div> -->
+
+              <div class="row">
+                <div class="col-12">
+                    <button class="btn btn-sm btn-primary" (click)="isCartPopupOpen = false" [routerLink]="['/create-order']">CheckOut</button>
+                </div>
+            </div>
+
+          </div>
       </div>
   </div>
 </nav>
 
 <router-outlet />
+
+
+<!-- The Modal -->
+<div class="modal" id="myModal" #registerModel>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Register</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeRegisterModel()"></button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+
+                <div class = "col-12">
+                    <label for="">Name</label>
+                    <input type="text" [(ngModel)] = "registerObj.name" class="form-control">
+                </div>
+
+                <div class = "col-12">
+                    <label for="">Mobile No</label>
+                    <input type="text" [(ngModel)] = "registerObj.MobileNo" class="form-control">
+                </div>
+
+                <div class = "col-12">
+                    <label for="">Password</label>
+                    <input type="text" [(ngModel)] = "registerObj.Password" class="form-control">
+                </div>
+
+            </div>
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeRegisterModel()">Close</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="onRegister()">Register</button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal" id="myModal" #loginModel>
+    <div class="modal-dialog">
+      <div class="modal-content">
+  
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">Register</h4>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" (click)="closeLoginModel()"></button>
+        </div>
+  
+        <!-- Modal body -->
+        <div class="modal-body">
+            <div class="row">
+
+                <div class = "col-12">
+                    <label for="">Name</label>
+                    <input type="text" [(ngModel)] = "loginObj.UserName" class="form-control">
+                </div>
+
+                <div class = "col-12">
+                    <label for="">Password</label>
+                    <input type="text" [(ngModel)] = "loginObj.UserPassword" class="form-control">
+                </div>
+
+            </div>
+        </div>
+  
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="closeLoginModel()">Close</button>
+          <button type="button" class="btn btn-danger" data-bs-dismiss="modal" (click)="onLogin()">Login</button>
+        </div>
+  
+      </div>
+    </div>
+  </div>
+  
+  
